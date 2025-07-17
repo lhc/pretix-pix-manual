@@ -1,0 +1,42 @@
+[project]
+name = "pretix-pix-manual"
+dynamic = ["version"]
+description = "Plugin for Brazilian Pix payment method with manual processing."
+readme = "README.rst"
+license = {text = "AGPL"}
+keywords = ["pretix"]
+authors = [
+    {name = "Renne Rocha", email = "renne@lhc.net.br"},
+]
+maintainers = [
+    {name = "Renne Rocha", email = "renne@lhc.net.br"},
+]
+
+dependencies = [
+]
+
+[project.entry-points."pretix.plugin"]
+pretix_pix_manual = "pretix_pix_manual:PretixPluginMeta"
+
+[project.entry-points."distutils.commands"]
+build = "pretix_plugin_build.build:CustomBuild"
+
+[build-system]
+requires = [
+    "setuptools",
+    "pretix-plugin-build",
+]
+
+[project.urls]
+homepage = "https://github.com/lhc/pretix-pix-manual"
+repository = "https://github.com/lhc/pretix-pix-manual"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "pretix_pix_manual.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["pretix*"]
+namespaces = false

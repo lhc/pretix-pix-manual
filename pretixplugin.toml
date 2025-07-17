@@ -1,0 +1,5 @@
+[plugin]
+package = "pretix-pix-manual"
+modules = [ "pretix_pix_manual" ]
+marketplace_name = "pix-manual"
+
