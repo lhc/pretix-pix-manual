@@ -11,12 +11,12 @@ except ImportError:
 class PluginApp(PluginConfig):
     default = True
     name = "pretix_pix_manual"
-    verbose_name = "PIX Manual"
+    verbose_name = "Brazilian Pix - Manual processing"
 
     class PretixPluginMeta:
-        name = gettext_lazy("PIX Manual")
+        name = gettext_lazy("Brazilian Pix - Manual processing")
         author = "Renne Rocha"
-        description = gettext_lazy("Pagamento PIX com confimação manual")
+        description = gettext_lazy("Brazilian Pix - Manual processing")
         visible = True
         version = __version__
         category = "PAYMENT"

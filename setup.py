@@ -1,4 +1,7 @@
 from setuptools import setup
 
 
-setup()
+setup(entry_points="""
+[pretix.plugin]
+pretix_pix_manual=pretix_pix_manual:PretixPluginMeta
+""")
