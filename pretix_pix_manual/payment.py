@@ -117,16 +117,10 @@ class PixManual(BasePaymentProvider):
         template = get_template("pretix_pix_manual/checkout_confirm.html")
         return template.render({})
 
-    def order_pending_mail_render(self, order, payment):
-        return "Alguma coisa no email de confirmação"
-
-    def payment_pending_render(self, request, payment):
+    def _generate_pix_code(self, payment):
         pix_key = self.settings.get("_pix_key")
         merchant_city = self.settings.get("_merchant_city") or ""
         merchant_name = self.settings.get("_merchant_name") or ""
-        proof_of_payment_email = self.settings.get("_proof_of_payment_email")
-
-        txid = f"{self.event.id}-{payment.order.code}"
         amount = str(payment.amount)
 
         pix = Pix()
@@ -136,6 +130,22 @@ class PixManual(BasePaymentProvider):
         pix.set_merchant_name(merchant_name)
         pix.set_txid(payment.order.code)
         pix_code = str(pix)
+
+        return pix_code
+
+    def order_pending_mail_render(self, order, payment):
+        pix_code = self._generate_pix_code(payment)
+        proof_of_payment_email = self.settings.get("_proof_of_payment_email")
+
+        return _(f"""To make the payment, copy and paste the following Pix code into your banking app.
+
+{pix_code}
+
+After making payment, send proof of payment to {proof_of_payment_email}, including your order code {payment.order.code} in the subject line.""")
+
+    def payment_pending_render(self, request, payment):
+        pix_code = self._generate_pix_code(payment)
+        proof_of_payment_email = self.settings.get("_proof_of_payment_email")
 
         qr = qrcode.QRCode(
             version=1,
