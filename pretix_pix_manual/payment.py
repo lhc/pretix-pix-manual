@@ -1,16 +1,13 @@
 import base64
+import qrcode
 from collections import OrderedDict
-from io import BytesIO
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
-
-import qrcode
-from pypix import Pix
-
+from io import BytesIO
 from pretix.base.payment import BasePaymentProvider
+from pypix import Pix
 
 from pretix_pix_manual.pix import PixInfo
 
@@ -53,9 +50,7 @@ class PixManual(BasePaymentProvider):
                 "_merchant_city",
                 forms.CharField(
                     label=_("Merchant city"),
-                    help_text=_(
-                        "City of payment beneficiary."
-                    ),
+                    help_text=_("City of payment beneficiary."),
                     required=False,
                     max_length=15,
                 ),
@@ -64,9 +59,7 @@ class PixManual(BasePaymentProvider):
                 "_merchant_name",
                 forms.CharField(
                     label=_("Merchant name"),
-                    help_text=_(
-                        "Name of payment beneficiary"
-                    ),
+                    help_text=_("Name of payment beneficiary"),
                     required=False,
                     max_length=25,
                 ),
@@ -101,17 +94,17 @@ class PixManual(BasePaymentProvider):
         return True
 
     def checkout_confirm_render(self, request, order=None, info_data=None):
-        template = get_template('pretix_pix_manual/checkout_confirm.html')
+        template = get_template("pretix_pix_manual/checkout_confirm.html")
         return template.render({})
 
     def order_pending_mail_render(self, order, payment):
         return "Alguma coisa no email de confirmação"
 
     def payment_pending_render(self, request, payment):
-        pix_key = self.settings.get('_pix_key')
-        merchant_city = self.settings.get('_merchant_city') or ''
-        merchant_name = self.settings.get('_merchant_name') or ''
-        proof_of_payment_email = self.settings.get('_proof_of_payment_email')
+        pix_key = self.settings.get("_pix_key")
+        merchant_city = self.settings.get("_merchant_city") or ""
+        merchant_name = self.settings.get("_merchant_name") or ""
+        proof_of_payment_email = self.settings.get("_proof_of_payment_email")
 
         txid = f"{self.event.id}-{payment.order.code}"
         amount = str(payment.amount)
@@ -139,12 +132,12 @@ class PixManual(BasePaymentProvider):
         img_str = base64.b64encode(buffered.getvalue())
         base64_qr_code = f"data:image/png;base64,{img_str.decode()}"
 
-        template = get_template('pretix_pix_manual/payment_pending.html')
+        template = get_template("pretix_pix_manual/payment_pending.html")
         ctx = {
-            'pix_code': pix_code,
-            'base64_qr_code': base64_qr_code,
-            'order_code': payment.order.code,
-            'proof_of_payment_email': proof_of_payment_email,
-            'contact_mail': self.event.settings.get("contact_mail"),
+            "pix_code": pix_code,
+            "base64_qr_code": base64_qr_code,
+            "order_code": payment.order.code,
+            "proof_of_payment_email": proof_of_payment_email,
+            "contact_mail": self.event.settings.get("contact_mail"),
         }
         return template.render(ctx, request=request)
