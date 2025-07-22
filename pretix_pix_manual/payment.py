@@ -1,4 +1,6 @@
 import base64
+import re
+import uuid
 import qrcode
 from collections import OrderedDict
 from django import forms
@@ -9,11 +11,29 @@ from io import BytesIO
 from pretix.base.payment import BasePaymentProvider
 from pypix import Pix
 
-from pretix_pix_manual.pix import PixInfo
 
+def is_valid_pix_key(key):
+    # Email regex
+    email_regex = re.compile(r"^[^@]+@[^@]+\.[^@]+$")
+    if email_regex.match(key):
+        return True
 
-def _is_valid_pix_key(pix_key):
-    return True
+    # CPF: 11 digits
+    if re.fullmatch(r"\d{11}", key):
+        return True
+
+    # CNPJ: 14 digits
+    if re.fullmatch(r"\d{14}", key):
+        return True
+
+    # Random key: UUID format
+    try:
+        parsed_uuid = uuid.UUID(key)
+        return True
+    except ValueError:
+        pass
+
+    return False
 
 
 class PixManual(BasePaymentProvider):
@@ -69,7 +89,7 @@ class PixManual(BasePaymentProvider):
 
     def settings_form_clean(self, cleaned_data):
         pix_key = cleaned_data.get("payment_pix_manual__pix_key")
-        if not _is_valid_pix_key(pix_key):
+        if not is_valid_pix_key(pix_key):
             raise ValidationError(
                 {"payment_pix_manual__pix_key": _("Please provide a valid Pix key.")}
             )
