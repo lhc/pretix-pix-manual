@@ -1,10 +1,18 @@
+import base64
 from collections import OrderedDict
+from io import BytesIO
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
 
+import qrcode
+from pypix import Pix
+
 from pretix.base.payment import BasePaymentProvider
+
+from pretix_pix_manual.pix import PixInfo
 
 
 def _is_valid_pix_key(pix_key):
@@ -30,7 +38,39 @@ class PixManual(BasePaymentProvider):
                     ),
                     required=True,
                 ),
-            )
+            ),
+            (
+                "_proof_of_payment_email",
+                forms.EmailField(
+                    label=_("Proof of payment e-mail"),
+                    help_text=_(
+                        "Email address that customers should use to send proof of payment",
+                    ),
+                    required=True,
+                ),
+            ),
+            (
+                "_merchant_city",
+                forms.CharField(
+                    label=_("Merchant city"),
+                    help_text=_(
+                        "City of payment beneficiary."
+                    ),
+                    required=False,
+                    max_length=15,
+                ),
+            ),
+            (
+                "_merchant_name",
+                forms.CharField(
+                    label=_("Merchant name"),
+                    help_text=_(
+                        "Name of payment beneficiary"
+                    ),
+                    required=False,
+                    max_length=25,
+                ),
+            ),
         ]
         return OrderedDict(custom_keys + default_form_fields)
 
@@ -45,7 +85,7 @@ class PixManual(BasePaymentProvider):
 
     def settings_content_render(self, request):
         return _(
-            "This payment method will generate a Pix key with order information "
+            "This payment method will generate a Pix code with order information "
             "that your customer can use to make the payment. Payment confirmation, "
             "cancellations, and refunds must be done manually."
         )
@@ -61,15 +101,50 @@ class PixManual(BasePaymentProvider):
         return True
 
     def checkout_confirm_render(self, request, order=None, info_data=None):
-        return "Review order info"
+        template = get_template('pretix_pix_manual/checkout_confirm.html')
+        return template.render({})
 
     def order_pending_mail_render(self, order, payment):
         return "Alguma coisa no email de confirmação"
 
     def payment_pending_render(self, request, payment):
-        """
-        Render customer-facing instructions on how to proceed with a pending payment
+        pix_key = self.settings.get('_pix_key')
+        merchant_city = self.settings.get('_merchant_city') or ''
+        merchant_name = self.settings.get('_merchant_name') or ''
+        proof_of_payment_email = self.settings.get('_proof_of_payment_email')
 
-        :return: HTML
-        """
-        return "como vou pagar essa bodega"
+        txid = f"{self.event.id}-{payment.order.code}"
+        amount = str(payment.amount)
+
+        pix = Pix()
+        pix.set_pixkey(pix_key)
+        pix.set_amount(amount)
+        pix.set_merchant_city(merchant_city)
+        pix.set_merchant_name(merchant_name)
+        pix.set_txid(payment.order.code)
+        pix_code = str(pix)
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=6,
+            border=4,
+        )
+        qr.add_data(pix_code)
+        qr.make(fit=True)
+        qr_code_img = qr.make_image(fill_color="black", back_color="white")
+
+        buffered = BytesIO()
+        qr_code_img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue())
+        base64_qr_code = f"data:image/png;base64,{img_str.decode()}"
+
+        template = get_template('pretix_pix_manual/payment_pending.html')
+        ctx = {
+            'pix_code': pix_code,
+            'base64_qr_code': base64_qr_code,
+            'order_code': payment.order.code,
+            'proof_of_payment_email': proof_of_payment_email,
+            'contact_mail': self.event.settings.get("contact_mail"),
+        }
+        return template.render(ctx, request=request)

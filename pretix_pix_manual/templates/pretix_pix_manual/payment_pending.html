@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<p>{% blocktrans trimmed %}
+	Your order has been successfully received. Make the payment via Pix by scanning the
+	QR Code below or copy and paste the following code into your banking app.
+{% endblocktrans %}</p>
+
+<center><img src="{{ base64_qr_code }}" /></center>
+<center><p>{{ pix_code }}</p></center>
+
+<hr/>
+
+<p>{% blocktrans trimmed %}
+	After making payment, send proof of payment to <strong>{{ proof_of_payment_email }}</strong>, 
+	including your order code <strong>{{ order_code }}</strong> in the subject line.
+{% endblocktrans %}</p>
+
+<p>{% blocktrans trimmed %}
+	<strong>IMPORTANT: Payment confirmation is handled manually by the event organizers. 
+	Therefore, if you do not send proof of payment, your order will remain pending payment, 
+	preventing you from checking in.</strong>
+{% endblocktrans %}</p>
+
+<p>{% blocktrans trimmed %}
+	If you have any questions regarding your order, please contact the event organizers
+	{% endblocktrans %} 
+	{% if contact_mail %}at <strong>{{ contact_mail }}</strong>{% endif %}.
+</p>
+
+<hr/>
