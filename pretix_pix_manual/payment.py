@@ -1,15 +1,18 @@
 import base64
 import re
 import uuid
-import qrcode
 from collections import OrderedDict
+from io import BytesIO
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
-from io import BytesIO
-from pretix.base.payment import BasePaymentProvider
+
+import qrcode
 from pypix import Pix
+
+from pretix.base.payment import BasePaymentProvider
 
 
 def is_valid_pix_key(key):
@@ -137,11 +140,13 @@ class PixManual(BasePaymentProvider):
         pix_code = self._generate_pix_code(payment)
         proof_of_payment_email = self.settings.get("_proof_of_payment_email")
 
-        return _(f"""To make the payment, copy and paste the following Pix code into your banking app.
+        return _(
+            f"""To make the payment, copy and paste the following Pix code into your banking app.
 
 {pix_code}
 
-After making payment, send proof of payment to {proof_of_payment_email}, including your order code {payment.order.code} in the subject line.""")
+After making payment, send proof of payment to {proof_of_payment_email}, including your order code {payment.order.code} in the subject line."""
+        )
 
     def payment_pending_render(self, request, payment):
         pix_code = self._generate_pix_code(payment)

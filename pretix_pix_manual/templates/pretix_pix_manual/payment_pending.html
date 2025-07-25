@@ -24,7 +24,7 @@
 <p>{% blocktrans trimmed %}
 	If you have any questions regarding your order, please contact the event organizers
 	{% endblocktrans %} 
-	{% if contact_mail %}at <strong>{{ contact_mail }}</strong>{% endif %}.
+	{% if contact_mail %}{% blocktrans trimmed %}at <strong>{{ contact_mail }}</strong>{% endblocktrans %}{% endif %}.
 </p>
 
 <hr/>
