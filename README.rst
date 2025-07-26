@@ -17,26 +17,26 @@ Development setup
 
 5. Execute ``make`` within this directory to compile translations.
 
-6. Restart your local pretix server. You can now use the plugin from this repository for your events by enabling it in
-   the 'plugins' tab in the settings.
+6. Restart your local pretix server. You can now use the plugin from this repository for your events by enabling it in the 'plugins' tab in the settings.
 
-This plugin has CI set up to enforce a few code style rules. To check locally, you need these packages installed::
+Linter and formatters
+---------------------
 
-    pip install flake8 isort black
+This plugin has a pre-commit hook configuration that checks and enforces some
+code style rules. To install it locally, you need to install `pre-commit` 
+package and install the hooks::
 
-To check your plugin for rule violations, run::
+    pip install pre-commit
+    pre-commit install
 
-    black --check .
-    isort -c .
-    flake8 .
+To check manually for rule violations, run::
 
-You can auto-fix some of these issues by running::
+    pre-commit run -a
 
-    isort .
-    black .
+When you have these hooks installed, you will not be allowed to commit code that
+doesn't follow the rules.
 
-To automatically check for these issues before you commit, you can run ``.install-hooks``.
-
+These rules are also enforced in CI.
 
 License
 -------

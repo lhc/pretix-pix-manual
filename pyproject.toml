@@ -73,3 +73,14 @@ push = false
 "pretix_pix_manual/__init__.py" = [
     "{version}",
 ]
+
+[tool.isort]
+known_first_party = ["pretix"]
+known_third_party = ["django", "pypix", "qrcode"]
+combine_star = true
+combine_as_imports = true
+order_by_type = true
+multi_line_output = 3
+include_trailing_comma = true
+use_parentheses = true
+line_length = 88

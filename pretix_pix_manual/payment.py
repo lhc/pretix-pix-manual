@@ -4,12 +4,11 @@ import uuid
 from collections import OrderedDict
 from io import BytesIO
 
+import qrcode
 from django import forms
 from django.core.exceptions import ValidationError
 from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
-
-import qrcode
 from pypix import Pix
 
 from pretix.base.payment import BasePaymentProvider
@@ -31,7 +30,7 @@ def is_valid_pix_key(key):
 
     # Random key: UUID format
     try:
-        parsed_uuid = uuid.UUID(key)
+        _ = uuid.UUID(key)
         return True
     except ValueError:
         pass
