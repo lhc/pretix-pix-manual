@@ -9,9 +9,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
-from pypix import Pix
 
 from pretix.base.payment import BasePaymentProvider
+from pretix_pix_manual.pix import Pix
 
 
 def is_valid_pix_key(key):

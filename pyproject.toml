@@ -18,7 +18,6 @@ maintainers = [
 ]
 
 dependencies = [
-    "pypix",
     "qrcode",
 ]
 
@@ -76,7 +75,7 @@ push = false
 
 [tool.isort]
 known_first_party = ["pretix"]
-known_third_party = ["django", "pypix", "qrcode"]
+known_third_party = ["django", "qrcode"]
 combine_star = true
 combine_as_imports = true
 order_by_type = true
