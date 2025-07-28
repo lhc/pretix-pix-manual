@@ -38,15 +38,29 @@ doesn't follow the rules.
 
 These rules are also enforced in CI.
 
+Releasing new version
+---------------------
+
+To create a new release you need to have `bumpver`_ installed::
+
+    pip install bumpver
+
+The projet is versioned using the pattern `major.minor.patch` 
+(`--major`, `--minor` and `--patch`). Use the desired flag before running it::
+
+    bumpver update --minor
+
+This command will update all version references, commit it and create
+a tag for that release. You can use `--dry` to check what will be updated
+without commiting it.
+
 License
 -------
-
 
 Copyright 2025 Renne Rocha
 
 Released under the terms of the AGPL
 
-
-
+.. _bumpver: https://github.com/mbarkhau/bumpver
 .. _pretix: https://github.com/pretix/pretix
 .. _pretix development setup: https://docs.pretix.eu/en/latest/development/setup.html

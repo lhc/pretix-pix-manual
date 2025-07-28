@@ -63,12 +63,6 @@ push = false
 "pyproject.toml" = [
     'current_version = "{version}"',
 ]
-"setup.py" = [
-    "{version}",
-]
-"README.rst" = [
-    "{version}",
-]
 "pretix_pix_manual/__init__.py" = [
     "{version}",
 ]
